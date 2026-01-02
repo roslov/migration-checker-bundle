@@ -1,0 +1,56 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: false
+        autoconfigure: true
+        public: false
+
+    roslov_migration_checker.command.check:
+        class: Roslov\MigrationCheckerBundle\Command\CheckCommand
+        arguments:
+            - '@roslov_migration_checker.environment'
+            - '@roslov_migration_checker.migration'
+            - '@roslov_migration_checker.printer'
+            - '@roslov_migration_checker.query'
+    roslov_migration_checker.migration_checker:
+        class: Roslov\MigrationChecker\MigrationChecker
+        arguments:
+            - '@logger'
+            - '@roslov_migration_checker.environment'
+            - '@roslov_migration_checker.migration'
+            - '@roslov_migration_checker.schema_state_comparer'
+            - '@roslov_migration_checker.printer'
+    roslov_migration_checker.environment:
+        class: Roslov\MigrationCheckerBundle\Migration\Environment
+        arguments:
+            - '@doctrine.migrations.dependency_factory'
+    roslov_migration_checker.migration:
+        class: Roslov\MigrationCheckerBundle\Migration\Migration
+        arguments:
+            - '@doctrine.migrations.dependency_factory'
+            - '@logger'
+    roslov_migration_checker.schema_state_comparer:
+        class: Roslov\MigrationChecker\Db\SchemaStateComparer
+        arguments:
+            - '@roslov_migration_checker.dump'
+    roslov_migration_checker.printer:
+        class: Roslov\MigrationCheckerBundle\Printer\Printer
+    roslov_migration_checker.dump:
+        class: Roslov\MigrationChecker\Db\MySqlDump
+        arguments:
+            - '@roslov_migration_checker.query'
+    roslov_migration_checker.query:
+        class: Roslov\MigrationCheckerBundle\Migration\MySqlQuery
+        arguments:
+            - '@doctrine.orm.default_entity_manager'
+
+    Roslov\MigrationChecker\MigrationChecker:
+        alias: roslov_migration_checker.migration_checker
+    Roslov\MigrationChecker\Contract\EnvironmentInterface:
+        alias: roslov_migration_checker.environment
+    Roslov\MigrationChecker\Contract\MigrationInterface:
+        alias: roslov_migration_checker.migration
+    Roslov\MigrationChecker\Contract\SchemaStateComparerInterface:
+        alias: roslov_migration_checker.schema_state_comparer
+    Roslov\MigrationChecker\Contract\PrinterInterface:
+        alias: roslov_migration_checker.printer
