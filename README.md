@@ -15,23 +15,18 @@ It is a Symfony bundle. It wraps the [Migration Checker](https://github.com/rosl
 - Doctrine Migrations 3.x
 
 
+## Limitation
+
+The console command `migration-checker:check` runs only in the test environment to avoid accidentally affecting the
+working database. Therefore, it should always be used with the option `--env=test`.
+
+
 ## Installation
 
 The package could be installed with composer:
 
 ```shell
 composer require --dev roslov/migration-checker-bundle
-```
-
-After package installation, add the bundle to your `config/bundles.php`.
-
-```php
-# config/bundles.php
-
-return [
-    // ...
-    \Roslov\MigrationCheckerBundle\RoslovMigrationCheckerBundle::class => ['test' => true],
-];
 ```
 
 
