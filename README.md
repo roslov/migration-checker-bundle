@@ -1,11 +1,13 @@
 Database Migration Checker Bundle
 =================================
 
-This package validates Doctrine database migrations. It checks whether all up and down migrations run without errors.
+The Database Migration Checker Bundle validates Doctrine Migrations in Symfony by executing each migration
+up and down against a clean test database and ensuring the schema returns to the exact same state after the
+rollback. It wraps the core [Migration Checker](https://github.com/roslov/migration-checker) library and
+provides a ready-to-use Symfony console command.
 
-It also validates that down migrations revert all changes, so there is no diff in the database after running them.
-
-It is a Symfony bundle. It wraps the [Migration Checker](https://github.com/roslov/migration-checker).
+This is intended for CI pipelines and local checks where you want confidence that every migration can be
+applied and reverted without leaving stray tables, columns, or indexes behind.
 
 
 ## Requirements
@@ -31,8 +33,38 @@ The package could be installed with composer:
 composer require --dev roslov/migration-checker-bundle
 ```
 
+If you are not using Symfony Flex, register the bundle manually:
+
+```php
+// config/bundles.php
+return [
+    // ...
+    Roslov\MigrationCheckerBundle\RoslovMigrationCheckerBundle::class => ['test' => true],
+];
+```
 
 ## General usage
+
+### What the checker does
+
+For each new Doctrine migration, the checker will:
+
+1. Apply the migration (up).
+2. Roll it back (down).
+3. Compare the database schema before and after to ensure they match.
+4. Re-apply the migration to proceed to the next one.
+
+If the schema differs after a rollback, the command fails and prints a unified diff of the schema changes.
+
+### Prerequisites
+
+To get useful results, make sure:
+
+- The command is executed in the **test** environment (`--env=test`).
+- Your test database is **empty** before the run (fresh schema).
+- Doctrine Migrations is configured for the same connection your test environment uses.
+
+### Run locally
 
 You can run the command to check your migrations:
 
@@ -44,7 +76,7 @@ Be careful to run it in the test environment, otherwise you can damage your data
 
 Also, ensure that you run this command on an empty database each time.
 
-The output example of the successful run:
+### Successful output example
 ```
 [info] Migration check started.
 [info] Preparing migration environment...
@@ -65,7 +97,7 @@ The output example of the successful run:
 [info] Migration check completed successfully.
 ```
 
-The output example of the failed run:
+### Failed output example
 ```
 [info] Migration check started.
 [info] Preparing migration environment...
@@ -108,6 +140,11 @@ In MigrationChecker.php line 67:
   The up and down migrations have resulted in a different schema state after rollback.
 ```
 
+### Run in CI
+
+The following example spins up a MySQL container, waits for it to be ready, runs the check, and then
+cleans up. Adjust database credentials and the image name to match your project.
+
 If you want to run it in your CI, you can do something like this:
 
 ```shell
@@ -139,7 +176,7 @@ docker run --network=test-network --rm \
 # Stops the test database
 docker stop test-db
 # Stops the test environment
-docker network rm meta-network
+docker network rm test-network
 ```
 
 
@@ -161,4 +198,3 @@ The code style is analyzed with [PHP_CodeSniffer](https://github.com/squizlabs/P
 ```shell
 ./vendor/bin/phpcs --extensions=php --colors --standard=PSR12Ext --ignore=vendor/* -p -s .
 ```
-
