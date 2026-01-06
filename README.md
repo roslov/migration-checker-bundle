@@ -17,6 +17,8 @@ It is a Symfony bundle. It wraps the [Migration Checker](https://github.com/rosl
 
 ## Limitation
 
+This bundle currently supports MySQL/MariaDB only.
+
 The console command `migration-checker:check` runs only in the test environment to avoid accidentally affecting the
 working database. Therefore, it should always be used with the option `--env=test`.
 
