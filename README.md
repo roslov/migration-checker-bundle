@@ -82,9 +82,11 @@ The output example of the failed run:
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 
 
-+Table: event
++-- Table:
++event
 +
-+Create Table: CREATE TABLE `event` (
++-- Create Table:
++CREATE TABLE `event` (
 +  `id` bigint(20) NOT NULL AUTO_INCREMENT,
 +  `microtime` double(16,6) NOT NULL COMMENT 'Unix timestamp with microseconds',
 +  `producer_name` varchar(64) NOT NULL COMMENT 'Producer name',
@@ -102,6 +104,40 @@ In MigrationChecker.php line 67:
 
   [Roslov\MigrationChecker\Exception\SchemaDiffersException]
   The up and down migrations have resulted in a different schema state after rollback.
+```
+
+If you want to run it in your CI, you can do something like this:
+
+```shell
+# Stops the previously running test environment and database (if the previous run failed)
+docker stop test-db || true
+docker network rm test-network || true
+# Prepares the new test environment
+docker network create test-network
+# Starts the test database
+docker run --name test-db --network=test-network -d --rm \
+    -e MYSQL_ROOT_PASSWORD=testrootpass \
+    -e MYSQL_DATABASE=test \
+    -e MYSQL_USER=testuser \
+    -e MYSQL_PASSWORD=testpass \
+    mysql:8.4.5 --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+# Waits until the database is ready
+while ! docker exec test-db \
+    mysql --user=testuser --password=testpass \
+    -e 'SELECT 1' \
+    >/dev/null 2>&1; do
+    echo 'Waiting for database connection...'
+    sleep 1
+done
+# Runs the migration check.
+# This command should fail if there are problems with migrations
+docker run --network=test-network --rm \
+    your-project-image:latest \
+    bin/console migration-checker:check --env=test -vv
+# Stops the test database
+docker stop test-db
+# Stops the test environment
+docker network rm meta-network
 ```
 
 
