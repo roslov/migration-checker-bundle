@@ -6,13 +6,9 @@ namespace Roslov\MigrationCheckerBundle\Command;
 
 use InvalidArgumentException;
 use Override;
-use Roslov\MigrationChecker\Contract\EnvironmentInterface;
+use Psr\Log\LoggerAwareInterface;
+use Roslov\MigrationChecker\Contract\MigrationCheckerInterface;
 use Roslov\MigrationChecker\Contract\MigrationInterface;
-use Roslov\MigrationChecker\Contract\PrinterInterface;
-use Roslov\MigrationChecker\Contract\QueryInterface;
-use Roslov\MigrationChecker\Db\MySqlDump;
-use Roslov\MigrationChecker\Db\SchemaStateComparer;
-use Roslov\MigrationChecker\MigrationChecker;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,16 +24,12 @@ final class CheckCommand extends Command
     /**
      * Constructor.
      *
-     * @param EnvironmentInterface $environment Environment preparer
-     * @param MigrationInterface $migration Migration handler
-     * @param PrinterInterface $printer State printer
-     * @param QueryInterface $query Query fetcher
+     * @param MigrationCheckerInterface $migrationChecker Migration checker
+     * @param MigrationInterface $migration Migration runner
      */
     public function __construct(
-        private readonly EnvironmentInterface $environment,
+        private readonly MigrationCheckerInterface $migrationChecker,
         private readonly MigrationInterface $migration,
-        private readonly PrinterInterface $printer,
-        private readonly QueryInterface $query,
     ) {
         parent::__construct();
     }
@@ -46,7 +38,6 @@ final class CheckCommand extends Command
      * @inheritDoc
      */
     #[Override]
-    // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClassBeforeLastUsed
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $environment = $input->getOption('env');
@@ -58,19 +49,11 @@ final class CheckCommand extends Command
 
         $logger = new ConsoleLogger($output);
         $this->migration->setLogger($logger);
+        if ($this->migrationChecker instanceof LoggerAwareInterface) {
+            $this->migrationChecker->setLogger($logger);
+        }
 
-        $dump = new MySqlDump($this->query);
-        $comparer = new SchemaStateComparer($dump);
-
-        $checker = new MigrationChecker(
-            $logger,
-            $this->environment,
-            $this->migration,
-            $comparer,
-            $this->printer,
-        );
-
-        $checker->check();
+        $this->migrationChecker->check();
 
         return Command::SUCCESS;
     }

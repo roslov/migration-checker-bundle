@@ -18,9 +18,15 @@ applied and reverted without leaving stray tables, columns, or indexes behind.
 - Doctrine ORM 2.0 or higher.
 
 
-## Limitation
+## Supported database types and versions
 
-This bundle currently supports MySQL/MariaDB only.
+This bundle supports MySQL, MariaDB, PostgreSQL, and others.
+
+See all supported database types and versions in the
+[Migration Checker documentation](https://github.com/roslov/migration-checker#supported-database-types-and-versions).
+
+
+## Limitations
 
 The console command `migration-checker:check` runs only in the test environment to avoid accidentally affecting the
 working database. Therefore, it should always be used with the option `--env=test`.
@@ -40,7 +46,7 @@ If you are not using Symfony Flex, register the bundle manually:
 // config/bundles.php
 return [
     // ...
-    Roslov\MigrationCheckerBundle\RoslovMigrationCheckerBundle::class => ['test' => true],
+    Roslov\MigrationCheckerBundle\RoslovMigrationCheckerBundle::class => ['dev' => true, 'test' => true],
 ];
 ```
 
