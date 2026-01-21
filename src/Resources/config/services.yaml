@@ -40,7 +40,7 @@ services:
         arguments:
             - '@roslov_migration_checker.query'
     roslov_migration_checker.query:
-        class: Roslov\MigrationCheckerBundle\Migration\MySqlQuery
+        class: Roslov\MigrationCheckerBundle\Migration\SqlQuery
         arguments:
             - '@doctrine.orm.default_entity_manager'
 

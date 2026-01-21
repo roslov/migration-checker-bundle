@@ -8,9 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Roslov\MigrationChecker\Contract\QueryInterface;
 
 /**
- * Fetches data from MySQL.
+ * Fetches data from a database.
  */
-final class MySqlQuery implements QueryInterface
+final class SqlQuery implements QueryInterface
 {
     /**
      * Constructor.
@@ -26,6 +26,11 @@ final class MySqlQuery implements QueryInterface
      */
     public function execute(string $query, array $params = []): array
     {
-        return $this->em->getConnection()->prepare($query)->executeQuery($params)->fetchAllAssociative();
+        $stmt = $this->em->getConnection()->prepare($query);
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value);
+        }
+
+        return $stmt->executeQuery()->fetchAllAssociative();
     }
 }
