@@ -8,7 +8,10 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use ReflectionClass;
 use ReflectionException;
 use Roslov\MigrationChecker\Contract\MigrationInterface;
@@ -18,18 +21,21 @@ use function count;
 /**
  * Handles database migrations.
  */
-final class Migration implements MigrationInterface
+final class Migration implements MigrationInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * Constructor.
      *
      * @param DependencyFactory $dependencyFactory Dependency factory
-     * @param LoggerInterface $logger Logger
+     * @param LoggerInterface|null $logger Logger
      */
     public function __construct(
         private readonly DependencyFactory $dependencyFactory,
-        private LoggerInterface $logger,
+        ?LoggerInterface $logger,
     ) {
+        $this->setLogger($logger ?? new NullLogger());
     }
 
     /**

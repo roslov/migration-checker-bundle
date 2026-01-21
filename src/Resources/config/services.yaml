@@ -8,18 +8,17 @@ services:
     roslov_migration_checker.command.check:
         class: Roslov\MigrationCheckerBundle\Command\CheckCommand
         arguments:
-            - '@roslov_migration_checker.environment'
+            - '@roslov_migration_checker.migration_checker'
             - '@roslov_migration_checker.migration'
-            - '@roslov_migration_checker.printer'
-            - '@roslov_migration_checker.query'
     roslov_migration_checker.migration_checker:
         class: Roslov\MigrationChecker\MigrationChecker
         arguments:
-            - '@logger'
             - '@roslov_migration_checker.environment'
             - '@roslov_migration_checker.migration'
             - '@roslov_migration_checker.schema_state_comparer'
             - '@roslov_migration_checker.printer'
+            - '@roslov_migration_checker.database_detector'
+            - '@logger'
     roslov_migration_checker.environment:
         class: Roslov\MigrationCheckerBundle\Migration\Environment
         arguments:
@@ -36,7 +35,12 @@ services:
     roslov_migration_checker.printer:
         class: Roslov\MigrationCheckerBundle\Printer\Printer
     roslov_migration_checker.dump:
-        class: Roslov\MigrationChecker\Db\MySqlDump
+        class: Roslov\MigrationChecker\Db\Dumper
+        arguments:
+            - '@roslov_migration_checker.query'
+            - '@roslov_migration_checker.database_detector'
+    roslov_migration_checker.database_detector:
+        class: Roslov\MigrationChecker\Db\DatabaseDetector
         arguments:
             - '@roslov_migration_checker.query'
     roslov_migration_checker.query:
@@ -44,7 +48,7 @@ services:
         arguments:
             - '@doctrine.orm.default_entity_manager'
 
-    Roslov\MigrationChecker\MigrationChecker:
+    Roslov\MigrationChecker\Contract\MigrationCheckerInterface:
         alias: roslov_migration_checker.migration_checker
     Roslov\MigrationChecker\Contract\EnvironmentInterface:
         alias: roslov_migration_checker.environment
