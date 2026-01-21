@@ -10,6 +10,7 @@ use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
+use ReflectionException;
 use Roslov\MigrationChecker\Contract\MigrationInterface;
 
 use function count;
@@ -95,5 +96,12 @@ final class Migration implements MigrationInterface
         $reflection = new ReflectionClass(AbstractMigration::class);
         $property = $reflection->getProperty('plannedSql');
         $property->setValue($migration, []);
+        try {
+            $property = $reflection->getProperty('frozen');
+            $property->setValue($migration, false);
+            // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+        } catch (ReflectionException) {
+            // If missing, the `frozen` property is ignored for back-compatibility
+        }
     }
 }
