@@ -1,0 +1,310 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+name: Compatibility tests
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} | Symfony ${{ matrix.symfony }} | Doctrine Migrations Bundle ${{ matrix.migrations-bundle }} | Doctrine ORM ${{ matrix.orm }}
+    runs-on: ubuntu-latest
+
+    env:
+      symfony-dir: app
+
+    strategy:
+      matrix:
+        php:
+          - 8.5
+          - 8.4
+          - 8.3
+          - 8.2
+          - 8.1
+        symfony:
+          # Strings are needed here to prevent converting to major versions (6.0 could be 6)
+          - "8.0"
+          - "7.4"
+          - "7.0"
+          - "6.4"
+          - "6.0"
+        migrations-bundle:
+          - 4.0.0
+          - 3.7.0
+          - 3.4.3
+          - 3.3.1
+          - 3.2.1
+        orm:
+          - 3.6.1
+          - 3.3.4
+          - 3.0.3
+          - 2.20.9
+          - 2.13.5
+        # Incompatible combinations
+        exclude:
+          # Dependency incompatibility
+          - php: 8.5
+            symfony: "7.0"
+            migrations-bundle: 4.0.0
+          - php: 8.5
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 3.0.3
+          - php: 8.5
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 2.20.9
+          - php: 8.5
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 2.13.5
+
+          - php: 8.4
+            symfony: "7.0"
+            migrations-bundle: 4.0.0
+          - php: 8.4
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 3.0.3
+          - php: 8.4
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 2.20.9
+          - php: 8.4
+            symfony: "6.4"
+            migrations-bundle: 4.0.0
+            orm: 2.13.5
+          - php: 8.4
+            symfony: "6.0"
+            migrations-bundle: 3.7.0
+            orm: 2.20.9
+          - php: 8.4
+            symfony: "6.0"
+            migrations-bundle: 3.7.0
+            orm: 2.13.5
+
+          - php: 8.3
+            symfony: "8.0"
+          - php: 8.3
+            migrations-bundle: 4.0.0
+
+          - php: 8.2
+            symfony: "8.0"
+          - php: 8.2
+            migrations-bundle: 4.0.0
+
+          - php: 8.1
+            symfony: "8.0"
+          - php: 8.1
+            symfony: "7.4"
+          - php: 8.1
+            symfony: "7.0"
+          - php: 8.1
+            migrations-bundle: 4.0.0
+
+          - symfony: "8.0"
+            migrations-bundle: 3.4.3
+          - symfony: "8.0"
+            migrations-bundle: 3.3.1
+          - symfony: "8.0"
+            migrations-bundle: 3.2.1
+          - symfony: "8.0"
+            orm: 3.3.4
+          - symfony: "8.0"
+            orm: 3.0.3
+          - symfony: "8.0"
+            orm: 2.20.9
+          - symfony: "8.0"
+            orm: 2.13.5
+
+          - symfony: "7.4"
+            migrations-bundle: 4.0.0
+            orm: 3.0.3
+          - symfony: "7.4"
+            migrations-bundle: 4.0.0
+            orm: 2.20.9
+          - symfony: "7.4"
+            migrations-bundle: 4.0.0
+            orm: 2.13.5
+          - symfony: "7.4"
+            migrations-bundle: 3.2.1
+          - symfony: "7.4"
+            orm: 2.13.5
+
+          - symfony: "7.0"
+            migrations-bundle: 4.0.0
+            orm: 3.0.3
+          - symfony: "7.0"
+            migrations-bundle: 3.2.1
+          - symfony: "7.0"
+            orm: 2.13.5
+
+          - symfony: "6.4"
+            orm: 2.13.5
+
+          - symfony: "6.0"
+            migrations-bundle: 4.0.0
+          - symfony: "6.0"
+            migrations-bundle: 3.7.0
+            orm: 3.6.1
+          - symfony: "6.0"
+            migrations-bundle: 3.7.0
+            orm: 3.3.4
+          - symfony: "6.0"
+            migrations-bundle: 3.7.0
+            orm: 3.0.3
+          - symfony: "6.0"
+            migrations-bundle: 3.4.3
+            orm: 3.6.1
+          - symfony: "6.0"
+            migrations-bundle: 3.4.3
+            orm: 3.3.4
+          - symfony: "6.0"
+            migrations-bundle: 3.4.3
+            orm: 3.0.3
+          - symfony: "6.0"
+            migrations-bundle: 3.3.1
+            orm: 3.6.1
+          - symfony: "6.0"
+            migrations-bundle: 3.3.1
+            orm: 3.3.4
+          - symfony: "6.0"
+            migrations-bundle: 3.3.1
+            orm: 3.0.3
+          - symfony: "6.0"
+            migrations-bundle: 3.2.1
+            orm: 3.6.1
+          - symfony: "6.0"
+            migrations-bundle: 3.2.1
+            orm: 3.3.4
+          - symfony: "6.0"
+            migrations-bundle: 3.2.1
+            orm: 3.0.3
+
+          # Migration Bundle and ORM integration incompatibility
+          - migrations-bundle: 4.0.0
+            orm: 3.3.4
+          - migrations-bundle: 3.7.0
+            orm: 3.3.4
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          ini-values: date.timezone='UTC'
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Determine Composer cache directory on Linux
+        run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
+
+      - name: Cache dependencies installed with Composer
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.COMPOSER_CACHE_DIR }}
+          key: php${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            php${{ matrix.php }}-composer-
+
+      - name: Update Composer
+        run: composer self-update
+
+      - name: Install Symfony skeleton
+        run: |
+          COMPOSER_NO_AUDIT=1 COMPOSER_NO_SECURITY_BLOCKING=1 \
+          composer create-project "symfony/skeleton:${{ matrix.symfony }}.*" ${{ env.symfony-dir }}
+
+      - name: Install dependencies
+        run: |
+          cd ${{ env.symfony-dir }}
+          COMPOSER_NO_AUDIT=1 COMPOSER_NO_SECURITY_BLOCKING=1 \
+          composer require \
+            doctrine/orm:${{ matrix.orm }} \
+            doctrine/doctrine-migrations-bundle:${{ matrix.migrations-bundle }} \
+            -W \
+            --no-security-blocking --no-audit
+
+      - name: Check Migration Bundle and ORM compatibility
+        run: |
+          cd ${{ env.symfony-dir }}
+          bin/console doctrine:mapping:info || RESULT=$?
+          [ "$RESULT" -eq 255 ] && exit 255
+          exit 0
+
+      - name: Install ${{ github.repository }}
+        run: |
+          cd ${{ env.symfony-dir }}
+          composer config repositories.local path ${{ github.workspace }}
+          composer require \
+            --dev \
+            "${{ github.repository }}:*@dev" \
+            -W \
+            --no-security-blocking --no-audit
+
+      - name: Prepare environment variables for testing
+        run: |
+          cat <<'EOF' > ${{ env.symfony-dir }}/.env.test
+          DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_%kernel.environment%.db"
+          EOF
+
+      - name: Prepare a fake migration
+        run: |
+          cat <<'EOF' > ${{ env.symfony-dir }}/migrations/Version20260122000000.php
+          <?php
+          declare(strict_types=1);
+          namespace DoctrineMigrations;
+          final class Version20260122000000 extends \Doctrine\Migrations\AbstractMigration
+          {
+            public function up(\Doctrine\DBAL\Schema\Schema $schema): void
+            {
+              $this->addSql('SELECT 1');
+            }
+            public function down(\Doctrine\DBAL\Schema\Schema $schema): void
+            {
+              $this->addSql('SELECT 1');
+            }
+          }
+          EOF
+
+      # TODO: Remove when the real SqLiteDumper is ready
+      - name: Replace Dumper with the fake one to test query and migration runners for compatibility
+        run: |
+          cat <<'EOF' > ${{ env.symfony-dir }}/vendor/roslov/migration-checker/src/Db/Dumper.php
+          <?php
+          declare(strict_types=1);
+          namespace Roslov\MigrationChecker\Db;
+          final class Dumper implements \Roslov\MigrationChecker\Contract\DumperInterface
+          {
+            public function __construct(private readonly \Roslov\MigrationChecker\Contract\QueryInterface $query) {}
+            public function getDump(): \Roslov\MigrationChecker\Contract\StateInterface
+            {
+              $this->query->execute('SELECT 1');
+              return new State('-- Fake dump!');
+            }
+          }
+          EOF
+
+      - name: Run Migration Checker console command
+        run: |
+          cd ${{ env.symfony-dir }}
+          bin/console migration-checker:check --env=test -vv
