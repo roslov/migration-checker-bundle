@@ -21,8 +21,8 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.1",
-        "doctrine/migrations": "^3.0|^4.0",
-        "doctrine/orm": "^2.0|^3.0|^4.0",
+        "doctrine/doctrine-migrations-bundle": "^3.2.1|^4.0",
+        "doctrine/orm": "^2.0|^3.0",
         "psr/log": "^1.0|^2.0|^3.0",
         "roslov/migration-checker": "^0.4.0",
         "sebastian/diff": "^5.0|^6.0|^7.0|^8.0",

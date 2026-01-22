@@ -14,7 +14,7 @@ applied and reverted without leaving stray tables, columns, or indexes behind.
 
 - PHP 8.1 or higher,
 - Symfony 6.0 or higher,
-- Doctrine Migrations 3.0 or higher,
+- Doctrine Migrations Bundle 3.2.1 or higher,
 - Doctrine ORM 2.0 or higher.
 
 
