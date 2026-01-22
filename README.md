@@ -76,7 +76,7 @@ To get useful results, make sure:
 You can run the command to check your migrations:
 
 ```shell
-bin/console migration-checker:check --env=test -vv
+php bin/console migration-checker:check --env=test -vv
 ```
 
 Be careful to run it in the test environment, otherwise you can damage your data.
@@ -179,7 +179,7 @@ done
 # This command should fail if there are problems with migrations
 docker run --network=test-network --rm \
     your-project-image:latest \
-    bin/console migration-checker:check --env=test -vv
+    php bin/console migration-checker:check --env=test -vv
 # Stops the test database
 docker stop test-db
 # Stops the test environment
