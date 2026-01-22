@@ -247,7 +247,7 @@ jobs:
       - name: Check Migration Bundle and ORM compatibility
         run: |
           cd ${{ env.symfony-dir }}
-          bin/console doctrine:mapping:info || RESULT=$?
+          php bin/console doctrine:mapping:info || RESULT=$?
           [ "$RESULT" -eq 255 ] && exit 255
           exit 0
 
@@ -307,4 +307,4 @@ jobs:
       - name: Run Migration Checker console command
         run: |
           cd ${{ env.symfony-dir }}
-          bin/console migration-checker:check --env=test -vv
+          php bin/console migration-checker:check --env=test -vv
