@@ -48,7 +48,9 @@ final class CheckCommand extends Command
         }
 
         $logger = new ConsoleLogger($output);
-        $this->migration->setLogger($logger);
+        if ($this->migration instanceof LoggerAwareInterface) {
+            $this->migration->setLogger($logger);
+        }
         if ($this->migrationChecker instanceof LoggerAwareInterface) {
             $this->migrationChecker->setLogger($logger);
         }

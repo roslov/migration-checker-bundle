@@ -64,7 +64,7 @@ final class Migration implements MigrationInterface, LoggerAwareInterface
         $plan = $planCalculator->getPlanForVersions([$version], Direction::UP);
         $this->resetMigration($plan->getFirst()->getMigration());
         $migrator = $this->dependencyFactory->getMigrator();
-        $this->logger->info(sprintf('Applying the up migration "%s"...', $version));
+        $this->getLogger()->info(sprintf('Applying the up migration "%s"...', $version));
         $migrator->migrate($plan, new MigratorConfiguration());
     }
 
@@ -80,18 +80,8 @@ final class Migration implements MigrationInterface, LoggerAwareInterface
         $plan = $planCalculator->getPlanForVersions([$version], Direction::DOWN);
         $this->resetMigration($plan->getFirst()->getMigration());
         $migrator = $this->dependencyFactory->getMigrator();
-        $this->logger->info(sprintf('Applying the down migration "%s"...', $version));
+        $this->getLogger()->info(sprintf('Applying the down migration "%s"...', $version));
         $migrator->migrate($plan, new MigratorConfiguration());
-    }
-
-    /**
-     * Sets the logger.
-     *
-     * @param LoggerInterface $logger Logger
-     */
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -109,5 +99,19 @@ final class Migration implements MigrationInterface, LoggerAwareInterface
         } catch (ReflectionException) {
             // If missing, the `frozen` property is ignored for back-compatibility
         }
+    }
+
+    /**
+     * Return the logger.
+     *
+     * @return LoggerInterface Logger
+     */
+    private function getLogger(): LoggerInterface
+    {
+        if (!$this->logger instanceof LoggerInterface) {
+            $this->logger = new NullLogger();
+        }
+
+        return $this->logger;
     }
 }
