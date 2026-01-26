@@ -26,7 +26,7 @@ final class RoslovMigrationCheckerBundle extends Bundle
     /**
      * @inheritDoc
      */
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getContainerExtension(): ExtensionInterface
     {
         return new RoslovMigrationCheckerExtension();
     }

@@ -31,6 +31,7 @@ final class SqlQuery implements QueryInterface
             $stmt->bindValue($param, $value);
         }
 
+        /** @phpstan-ignore-next-line */
         return $stmt->executeQuery()->fetchAllAssociative();
     }
 }
