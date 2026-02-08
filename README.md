@@ -1,6 +1,11 @@
 Database Migration Checker Bundle
 =================================
 
+[![Latest Stable Version](https://poser.pugx.org/roslov/migration-checker-bundle/v)](https://packagist.org/packages/roslov/migration-checker-bundle)
+[![Total Downloads](https://poser.pugx.org/roslov/migration-checker-bundle/downloads)](https://packagist.org/packages/roslov/migration-checker-bundle)
+[![License](https://poser.pugx.org/roslov/migration-checker-bundle/license)](https://packagist.org/packages/roslov/migration-checker-bundle)
+[![PHP Version Require](https://poser.pugx.org/roslov/migration-checker-bundle/require/php)](https://packagist.org/packages/roslov/migration-checker-bundle)
+
 The Database Migration Checker Bundle validates Doctrine Migrations in Symfony by executing each migration
 up and down against a clean test database and ensuring the schema returns to the exact same state after the
 rollback. It wraps the core [Migration Checker](https://github.com/roslov/migration-checker) library and
