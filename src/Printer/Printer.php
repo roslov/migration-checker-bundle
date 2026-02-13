@@ -8,6 +8,7 @@ use Roslov\MigrationChecker\Contract\PrinterInterface;
 use Roslov\MigrationChecker\Contract\StateInterface;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function implode;
 use function preg_split;
@@ -44,14 +45,74 @@ final class Printer implements PrinterInterface
     private const COLOR_BOLD = "\033[1m";
 
     /**
+     * Output
+     */
+    private ?OutputInterface $output = null;
+
+    /**
      * @inheritDoc
      */
     public function displayDiff(StateInterface $previousState, StateInterface $currentState): void
     {
         $differ = new Differ(new UnifiedDiffOutputBuilder());
-        echo $this->colorizeUnifiedDiffAnsi(
-            $differ->diff($previousState->toString(), $currentState->toString()),
-        );
+        $diff = $differ->diff($previousState->toString(), $currentState->toString());
+        if ($this->output instanceof OutputInterface) {
+            $this->output->write($this->colorizeUnifiedDiff($diff));
+        } else {
+            echo $this->colorizeUnifiedDiffAnsi($diff);
+        }
+    }
+
+    /**
+     * Sets the output.
+     *
+     * @param OutputInterface $output Output
+     */
+    public function setOutput(OutputInterface $output): void
+    {
+        $this->output = $output;
+    }
+
+    /**
+     * Applies Symfony console tags to a unified diff string for visual enhancement.
+     *
+     * @param string $diff The unified diff string to be colorized
+     *
+     * @return string The colorized unified diff string
+     */
+    private function colorizeUnifiedDiff(string $diff): string
+    {
+        $out = [];
+        foreach ((array) preg_split("/\r\n|\n|\r/", $diff) as $line) {
+            $out[] = $this->colorizeLineSymfony((string) $line);
+        }
+
+        return implode(PHP_EOL, $out) . PHP_EOL;
+    }
+
+    /**
+     * Colorizes a single line using Symfony console tags.
+     *
+     * @param string $line The line to be colorized
+     *
+     * @return string The colorized line
+     */
+    private function colorizeLineSymfony(string $line): string
+    {
+        if (str_starts_with($line, '+++ ') || str_starts_with($line, '--- ')) {
+            return "<fg=cyan;options=bold>$line</>";
+        }
+        if (str_starts_with($line, '@@')) {
+            return "<fg=cyan;options=bold>$line</>";
+        }
+        if (str_starts_with($line, '+')) {
+            return "<fg=green>$line</>";
+        }
+        if (str_starts_with($line, '-')) {
+            return "<fg=red>$line</>";
+        }
+
+        return $line;
     }
 
     /**

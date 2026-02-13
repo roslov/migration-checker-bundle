@@ -55,6 +55,22 @@ return [
 ];
 ```
 
+## Configuration
+
+If you have a custom Doctrine setup, you can configure the entity manager and the migrations dependency factory.
+Create a configuration file `config/packages/roslov_migration_checker.yaml`:
+
+```yaml
+roslov_migration_checker:
+    # Doctrine entity manager name.
+    # Default: 'default' (uses 'doctrine.orm.default_entity_manager')
+    entity_manager: 'default'
+
+    # Doctrine Migrations dependency factory service ID.
+    # Default: 'doctrine.migrations.dependency_factory'
+    dependency_factory: 'doctrine.migrations.dependency_factory'
+```
+
 ## General usage
 
 ### What the checker does

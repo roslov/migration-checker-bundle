@@ -10,6 +10,7 @@ services:
         arguments:
             - '@roslov_migration_checker.migration_checker'
             - '@roslov_migration_checker.migration'
+            - '@roslov_migration_checker.printer'
     roslov_migration_checker.migration_checker:
         class: Roslov\MigrationChecker\MigrationChecker
         arguments:

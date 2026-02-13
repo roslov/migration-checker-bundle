@@ -86,6 +86,8 @@ final class Migration implements MigrationInterface, LoggerAwareInterface
 
     /**
      * Resets the migration for reuse.
+     *
+     * @param AbstractMigration $migration Migration to reset
      */
     private function resetMigration(AbstractMigration $migration): void
     {

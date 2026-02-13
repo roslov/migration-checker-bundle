@@ -22,6 +22,22 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        return new TreeBuilder(self::NODE_NAME);
+        $treeBuilder = new TreeBuilder(self::NODE_NAME);
+        $rootNode = $treeBuilder->getRootNode();
+
+        /** @phpstan-ignore-next-line */
+        $rootNode
+            ->children()
+                ->scalarNode('entity_manager')
+                    ->defaultValue('default')
+                    ->info('Doctrine entity manager name')
+                ->end()
+                ->scalarNode('dependency_factory')
+                    ->defaultValue('doctrine.migrations.dependency_factory')
+                    ->info('Doctrine Migrations dependency factory service ID')
+                ->end()
+            ->end();
+
+        return $treeBuilder;
     }
 }
