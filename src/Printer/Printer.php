@@ -99,10 +99,7 @@ final class Printer implements PrinterInterface
      */
     private function colorizeLineSymfony(string $line): string
     {
-        if (str_starts_with($line, '+++ ') || str_starts_with($line, '--- ')) {
-            return "<fg=cyan;options=bold>$line</>";
-        }
-        if (str_starts_with($line, '@@')) {
+        if (str_starts_with($line, '+++ ') || str_starts_with($line, '--- ') || str_starts_with($line, '@@')) {
             return "<fg=cyan;options=bold>$line</>";
         }
         if (str_starts_with($line, '+')) {
@@ -122,25 +119,35 @@ final class Printer implements PrinterInterface
      *
      * @return string The colorized unified diff string
      */
-    // phpcs:disable SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
     private function colorizeUnifiedDiffAnsi(string $diff): string
     {
         $out = [];
         foreach ((array) preg_split("/\r\n|\n|\r/", $diff) as $line) {
-            $line = (string) $line;
-            if (str_starts_with($line, '+++ ') || str_starts_with($line, '--- ')) {
-                $out[] = self::COLOR_BOLD . self::COLOR_CYAN . $line . self::COLOR_RESET;
-            } elseif (str_starts_with($line, '@@')) {
-                $out[] = self::COLOR_BOLD . self::COLOR_CYAN . $line . self::COLOR_RESET;
-            } elseif (str_starts_with($line, '+')) {
-                $out[] = self::COLOR_GREEN . $line . self::COLOR_RESET;
-            } elseif (str_starts_with($line, '-')) {
-                $out[] = self::COLOR_RED . $line . self::COLOR_RESET;
-            } else {
-                $out[] = $line;
-            }
+            $out[] = $this->colorizeLineAnsi((string) $line);
         }
 
         return implode(PHP_EOL, $out) . PHP_EOL;
+    }
+
+    /**
+     * Colorizes a single line using ANSI escape codes.
+     *
+     * @param string $line The line to be colorized
+     *
+     * @return string The colorized line
+     */
+    private function colorizeLineAnsi(string $line): string
+    {
+        if (str_starts_with($line, '+++ ') || str_starts_with($line, '--- ') || str_starts_with($line, '@@')) {
+            return self::COLOR_BOLD . self::COLOR_CYAN . $line . self::COLOR_RESET;
+        }
+        if (str_starts_with($line, '+')) {
+            return self::COLOR_GREEN . $line . self::COLOR_RESET;
+        }
+        if (str_starts_with($line, '-')) {
+            return self::COLOR_RED . $line . self::COLOR_RESET;
+        }
+
+        return $line;
     }
 }
