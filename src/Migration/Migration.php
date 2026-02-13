@@ -54,8 +54,6 @@ final class Migration implements MigrationInterface, LoggerAwareInterface
      */
     public function up(): void
     {
-        $metadataStorage = $this->dependencyFactory->getMetadataStorage();
-        $metadataStorage->ensureInitialized();
         $statusCalculator = $this->dependencyFactory->getMigrationStatusCalculator();
         $newMigrations = $statusCalculator->getNewMigrations();
         $firstMigrationPlan = $newMigrations->getItems()[0];

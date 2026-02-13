@@ -240,3 +240,27 @@ make phpcs
 ```
 
 from the host machine.
+
+### Static analysis
+
+Static analysis is performed with [PHPStan](https://phpstan.org/). To run it:
+
+```shell
+./vendor/bin/phpstan analyse --memory-limit=256M .
+```
+
+inside a container, or
+
+```shell
+make phpstan
+```
+
+from the host machine.
+
+### Full validation
+
+To run all checks (PHP syntax, coding style, PHPStan, and Rector) at once:
+
+```shell
+make validate
+```
