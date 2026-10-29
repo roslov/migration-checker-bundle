@@ -17,6 +17,7 @@ use ReflectionException;
 use Roslov\MigrationChecker\Contract\MigrationInterface;
 
 use function count;
+use function sprintf;
 
 /**
  * Handles database migrations.

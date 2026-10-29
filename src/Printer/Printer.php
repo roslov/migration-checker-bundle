@@ -7,12 +7,14 @@ namespace Roslov\MigrationCheckerBundle\Printer;
 use Roslov\MigrationChecker\Contract\PrinterInterface;
 use Roslov\MigrationChecker\Contract\StateInterface;
 use SebastianBergmann\Diff\Differ;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use SebastianBergmann\Diff\Output\StrictUnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function implode;
 use function preg_split;
 use function str_starts_with;
+
+use const PHP_EOL;
 
 /**
  * Prints schema state changes.
@@ -54,7 +56,16 @@ final class Printer implements PrinterInterface
      */
     public function displayDiff(StateInterface $previousState, StateInterface $currentState): void
     {
-        $differ = new Differ(new UnifiedDiffOutputBuilder());
+        // StrictUnifiedDiffOutputBuilder rather than UnifiedDiffOutputBuilder:
+        // sebastian/diff 9.0 removed the latter, and the strict builder exists
+        // unchanged across 5.0–9.0, so one code path covers every supported
+        // version. The file labels reproduce UnifiedDiffOutputBuilder's
+        // "--- Original / +++ New" header, which colorizeUnifiedDiff() and
+        // colorizeUnifiedDiffAnsi() key off.
+        $differ = new Differ(new StrictUnifiedDiffOutputBuilder([
+            'fromFile' => 'Original',
+            'toFile' => 'New',
+        ]));
         $diff = $differ->diff($previousState->toString(), $currentState->toString());
         if ($this->output instanceof OutputInterface) {
             $this->output->write($this->colorizeUnifiedDiff($diff));
