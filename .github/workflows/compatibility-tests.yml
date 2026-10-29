@@ -263,6 +263,7 @@ jobs:
 
       - name: Prepare a fake migration
         run: |
+          mkdir -p ${{ env.symfony-dir }}/migrations
           cat <<'EOF' > ${{ env.symfony-dir }}/migrations/Version20260122000000.php
           <?php
           declare(strict_types=1);

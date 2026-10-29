@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use function sprintf;
+
 /**
  * Migration checker extension.
  */
